@@ -32,8 +32,7 @@ small { font-size: 12px; } /* 小于 12px 的中文很难阅读，让 small 正�
 ul, ol { list-style: none; }
 
 /* 重置文本格式元素 */
-a { text-decoration: none; }
-a:hover { text-decoration: underline; }
+a { text-decoration: none; color: inherit; }
 
 abbr[title], acronym[title] { /* 注：1.ie6 不支持 abbr; 2.这里用了属性选择符，ie6 下无效果 */
     border-bottom: 1px dotted;
@@ -70,24 +69,52 @@ hr {
 .clearFix { *zoom:1; }
 
 
+.flex {
+    display: -webkit-box;
+    display: box;
+    display: -webkit-flex;
+    display: flex
+}
+
+.flex-column {
+    flex-flow: column;
+    -webkit-flex-flow: column
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+    -webkit-flex-wrap: wrap
+}
+
+.flex-item1 {
+    display: block;
+    -webkit-box-flex: 1;
+    box-flex: 1;
+    -webkit-flex: 1;
+    flex: 1
+}
+
 html{
     height: 100%;
 }
 #container,
-.content{
+.header,
+.left-nav{
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+    transition: left .2s ease-in;
 }
 #container{
-    top: 58px;
-    left: 300px;
     z-index: 1;
 }
-.content{
-    z-index: 2;
+.header.toggle{
+    left: 0;
+}
+.left-nav.toggle{
+    left: -300px;
 }
 .left-nav{
     float: left;
@@ -95,6 +122,8 @@ html{
     width: 300px;
     background: #2e3d49;
     color: #ffffff80;
+    overflow: hidden;
+    z-index: 2;
 }
 .nav-title{
     line-height: 58px;
@@ -108,12 +137,23 @@ html{
     border-bottom: 1px solid #1c262f;
 }
 .header{
+    left: 300px;
     height: 58px;
-    margin-left: 300px;
-    background: #1c262f;
+    line-height: 58px;
+    background: #2e3d49;
     border-bottom: 1px solid #1c262f;
     box-shadow: 0 2px 4px -2px rgba(0,0,0,.5);
     color: #fff;
+    z-index: 2;
+}
+.header .menu-left{
+    display: block;
+    padding: 0 15px;
+    font-size: 34px;
+    color: #02b3e4;
+}
+.header > a:active{
+    background: #1c262f;
 }
 .search-box{
     padding: 5px;
@@ -132,4 +172,29 @@ html{
     background: #02b3e4;
     color: #fff;
     cursor: pointer;
+}
+.city-list > li{
+    padding: 10px 20px;
+    line-height: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background .1s ease-in;
+}
+.city-list > li:hover{
+    background: #1c262f;
+    box-shadow: 0 0 0 2px #02b3e4 inset;
+}
+@media screen and (max-width: 800px) {
+    .header{
+        left: 0;
+    }
+    .header.toggle{
+        left: 300px;
+    }
+    .left-nav{
+        left: -300px;
+    }
+    .left-nav.toggle{
+        left: 0;
+    }
 }
