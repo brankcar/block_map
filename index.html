@@ -8,18 +8,57 @@
     <title>Document</title>
     <link rel="stylesheet" href="css/iconfont.css">
     <link rel="stylesheet" href="css/style.css">
-    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.4&key=496c35802cbe48ef913ee19e30059e3e"></script>
     <script src="js/jquery-1.7.1.min.js"></script>
     <script src="js/knockout-3.4.2.js"></script>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.4&key=496c35802cbe48ef913ee19e30059e3e"></script>
+    <script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+    <style>
+        .amap_lib_placeSearch,
+        .amap_lib_placeSearch_list{
+            background: transparent;
+            color: #ffffff80;
+            border: 0;
+        }
+        .amap_lib_placeSearch .poibox{
+            border: 0;
+            transition: background .1s ease-in;
+        }
+        .amap_lib_placeSearch .poibox:hover{
+            background: #1c262f;
+            box-shadow: 0 0 0 2px #02b3e4 inset;
+        }
+        .amap_lib_placeSearch_page{
+            position: fixed;
+            width: 300px;
+            left: 0;
+            bottom: 0;
+            background: #2e3d49;
+            transition: left .2s ease-in;
+        }
+        .amap_lib_placeSearch_page.toggle{
+            left: -300px;
+        }
+        @media screen and (max-width: 800px) {
+            .amap_lib_placeSearch_page{
+                left: -300px;
+            }
+            .amap_lib_placeSearch_page.toggle{
+                left: 0;
+            }
+        }
+    </style>
 </head>
 <body>
 <div id="container"></div>
 <div class="left-nav">
     <div class="nav-title">街区地图</div>
-    <div class="search-box clearFix"><input type="text"><button>搜索</button></div>
-    <ul class="city-list" data-bind="foreach: address">
-        <li data-bind="text: $data.name"></li>
-    </ul>
+    <div class="search-box clearFix"><input type="text" data-bind="value: filterContext"><button data-bind="click: filter">搜索</button></div>
+    <div id="result" class="result"></div>
+    <div class="result">
+        <ul class="city-list" data-bind="foreach: address">
+            <li data-bind="text: $data.name, click: $parent.listClick"></li>
+        </ul>
+    </div>
 </div>
 <div class="header flex">
     <a href="javascript:;" data-bind="click: toggleLeft" class="menu-left"><i class="iconfont icon-view-list"></i></a>
