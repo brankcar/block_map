@@ -11,7 +11,7 @@
     <script src="js/jquery-1.7.1.min.js"></script>
     <script src="js/knockout-3.4.2.js"></script>
     <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.4&key=496c35802cbe48ef913ee19e30059e3e"></script>
-    <script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+    <script src="http://webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
     <style>
         .amap_lib_placeSearch,
         .amap_lib_placeSearch_list{
@@ -52,11 +52,11 @@
 <div id="container"></div>
 <div class="left-nav">
     <div class="nav-title">街区地图</div>
-    <div class="search-box clearFix"><input type="text" data-bind="value: filterContext"><button data-bind="click: filter">搜索</button></div>
+    <div class="search-box clearFix"><input id="inputChange" type="text" data-bind="value: filterContext"><button data-bind="click: filter">搜索</button></div>
     <div id="result" class="result"></div>
     <div class="result">
         <ul class="city-list" data-bind="foreach: address">
-            <li data-bind="text: $data.name, click: $parent.listClick"></li>
+            <li data-bind="text: $data.name, click: $parent.listClick, visible: $data.is_show"></li>
         </ul>
     </div>
 </div>

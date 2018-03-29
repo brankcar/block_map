@@ -19,63 +19,75 @@ $(document).ready(function(){
         panel: 'result'
     };
     var ViewModel = function(){
-    	var that = this;
+    	var self = this;
     	// map对象
-        that.map = MAP;
+        self.map = MAP;
         // 标记点数组
-        that.markers = ko.observableArray([]);
+        self.markers = ko.observableArray([]);
         // 地址列表监听
-        that.address = ko.observableArray([]);
+        self.address = ko.observableArray([]);
         // 搜索输入文本
-        that.filterContext = ko.observable('');
+        self.filterContext = ko.observable('');
+        self.filterContext.changed = ko.observable(true);
         // 点击切换左侧列表是否显示
-        that.toggleLeft = function(){
+        self.toggleLeft = function(){
         	$('.header').toggleClass('toggle');
         	$('.left-nav').toggleClass('toggle');
             $('.amap_lib_placeSearch_page').toggleClass('toggle');
         };
         // list
-        that.$li = null;
+        self.$li = null;
         // list row
-        that.$li_row = $('.result');
+        self.$li_row = $('.result');
         // 筛选
-        that.filter = function(){
-
+        self.filter = function(){
+        	var _address = self.address();
+        	var _text = self.filterContext();
+        	var reg = new RegExp(_text);
+        	for(var i = 0,len = self.address().length; i < len; i++) {
+				if(self.address()[i].name.match(reg)){
+					self.address()[i].is_show(true);
+					$('.amap-marker').eq(i).show();
+				}else{
+					$('.amap-marker').eq(i).hide();
+					self.address()[i].is_show(false);
+				}
+			}
         };
         // 点击列表
-        that.listClick = function(item){
-            console.log(item)
+        self.listClick = function(item){
+            var _index = (Number(item.name.split('.')[0]) - 1);
+            $('.poibox').eq(_index).trigger('click');
         };
         // 初始化地图
-        that.init = function(){
+        self.init = function(){
             AMap.service('AMap.PlaceSearch',function(){
-                that.search = new AMap.PlaceSearch(OPTIONS);
+                self.search = new AMap.PlaceSearch(OPTIONS);
 
                 //关键字查询，您如果想修改结果展现效果，请参考页面：http://lbs.amap.com/fn/css-style/
-                that.search.search('景点', function(status, result){
+                self.search.search('景点', function(status, result){
                     if (status === 'complete' && result.info === 'OK') {
                         // 循环获取到的地址数组，并添加到address
                         for(var i = 0; i < result.poiList.pois.length; i++){
-                            result.poiList.pois[i].name = (i + 1) + '.' + result.poiList.pois[i].name;
                             var pois = result.poiList.pois[i];
-                            that.address.push(pois);
+                            pois.name = (i + 1) + '.' + pois.name;
+                            pois.is_show = ko.observable(true);
+                            self.address.push(pois);
                         }
-                        that.$li = $('.city-list li');
+                        self.$li = $('.city-list li');
                     }
                 });
             });
 
-            AMap.event.addListener(that.search, "markerClick", function(e){
-                var _li = that.$li.eq(e.index);
+            AMap.event.addListener(self.search, "markerClick", function(e){
+                var _li = self.$li.eq(e.index);
                 _li.addClass('hover').siblings('li').removeClass('hover');
-                that.$li_row.animate({
+                self.$li_row.animate({
                     scrollTop: (e.index + 1) * 40 - 40
                 },200);
             });
         };
 
-        that.init();
+        self.init();
     };
-    ko.applyBindings(new ViewModel());
-
 });
