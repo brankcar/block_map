@@ -220,3 +220,15 @@ html{
     border-radius: 5px;
     background: rgba(0,0,0,0.1);
 }
+.wearher{
+    position: absolute;
+    top: 65px;
+    right: 10px;
+    border: 1px solid #c6c6c6;
+    z-index: 2;
+    padding: 15px;
+    background: #fff;
+    box-shadow: 2px 2px 4px 1px #999;
+    line-height: 20px;
+    min-width: 200px;
+}

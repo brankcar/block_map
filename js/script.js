@@ -18,10 +18,17 @@ $(document).ready(function(){
         pageSize: 50, // 每页有多少条数据：1-50
         panel: 'result'
     };
+    /**
+     * 常量：[URL 第三方天气api接口]
+     * @type {String}
+     */
+    var URL = 'http://v.juhe.cn/weather/index';
     var ViewModel = function(){
     	var self = this;
     	// map对象
         self.map = MAP;
+        // 是否切换左侧列表
+        self.is_toggle = ko.observable(false);
         // 标记点数组
         self.markers = ko.observableArray([]);
         // 地址列表监听
@@ -29,11 +36,24 @@ $(document).ready(function(){
         // 搜索输入文本
         self.filterContext = ko.observable('');
         self.filterContext.changed = ko.observable(true);
+        /**
+         * [weather 天气对象]
+         * @type {Object}
+         */
+        self.weather = {
+        	temp: ko.observable(''), // 当前温度
+        	wind_direction: ko.observable(''),// 当前风向
+        	wind_strength: ko.observable(''),// 当前风力
+        	humidity: ko.observable(''),// 当前湿度
+        	adname: ko.observable(''),// 所在位置
+        	dressing_advice: ko.observable(''),// 穿衣建议
+        	error: ko.observable(false),// 是否有错误信息
+        	success: ko.observable(true), // 是否请求成功
+        	error_message: ko.observable('')// 错误信息
+        };
         // 点击切换左侧列表是否显示
         self.toggleLeft = function(){
-        	$('.header').toggleClass('toggle');
-        	$('.left-nav').toggleClass('toggle');
-            $('.amap_lib_placeSearch_page').toggleClass('toggle');
+        	self.is_toggle(self.is_toggle() ? false : true);
         };
         // list
         self.$li = null;
@@ -42,7 +62,7 @@ $(document).ready(function(){
         // 筛选
         self.filter = function(){
         	var _address = self.address();
-        	var _text = self.filterContext();
+        	var _text = self.filterContext().trim();// trim 去除左右空格
         	var reg = new RegExp(_text);
         	for(var i = 0,len = self.address().length; i < len; i++) {
 				if(self.address()[i].name.match(reg)){
@@ -55,9 +75,45 @@ $(document).ready(function(){
 			}
         };
         // 点击列表
-        self.listClick = function(item){
-            var _index = (Number(item.name.split('.')[0]) - 1);
+        self.listClick = function(item, event){
+        	var _name = item.name.split('.');
+            var _index = (Number(_name[0]) - 1);
             $('.poibox').eq(_index).trigger('click');
+            self.getWeather(item.adname); // 点击景点获取及时天气数据
+        };
+        // 第三方天气信息获取
+        self.getWeather = function(text){
+        	$.get(
+        		URL + '?cityname='+ encodeURI(text) +'&key=999c02eeb9e06c838c6e90f7188cd801',
+        		function(result){
+	        		if(result.resultcode == 200){
+        				self.weatherUpdata(result, text);
+	        		}else{
+	        			self.error(result.reason);
+	        		}
+        		},
+        		'jsonp'
+        	);
+        };
+        // 更新天气信息
+        self.weatherUpdata = function(data, adname){
+        	var _data = data.result
+        	var _sk = _data.sk;
+        	var _today = _data.today;
+			self.weather.error(false);
+        	self.weather.success(true);
+        	self.weather.temp(_sk.temp);
+        	self.weather.wind_direction(_sk.wind_direction);
+        	self.weather.wind_strength(_sk.wind_strength);
+        	self.weather.humidity(_sk.humidity);
+        	self.weather.adname(adname);
+        	self.weather.dressing_advice(_today.dressing_advice);
+        };
+        // 错误信息
+        self.error = function(err){
+        	self.weather.error(true);
+        	self.weather.success(false);
+        	self.weather.error_message('查询不到该地点准确信息');
         };
         // 初始化地图
         self.init = function(){
@@ -86,8 +142,11 @@ $(document).ready(function(){
                     scrollTop: (e.index + 1) * 40 - 40
                 },200);
             });
+            self.getWeather('成都', '成都市');
         };
 
         self.init();
     };
+
+    ko.applyBindings(new ViewModel());
 });
